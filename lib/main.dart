@@ -1,43 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:dicoding_flutter_codelabs/home_page.dart';
-void main() => runApp(new MyApp());
-class MyApp extends StatefulWidget {
+import 'package:http/http.dart' as http;
+import 'package:dicoding_flutter_codelabs/model/post.dart';
+import 'dart:convert';
 
-  @override
-  _MyAppState createState() => new _MyAppState();
+Future<Post> fetchPost() async {
+  final response =
+  await http.get('https://jsonplaceholder.typicode.com/posts/1');
+
+  if (response.statusCode == 200) {
+    // If the call to the server was successful, parse the JSON
+    return Post.fromJson(json.decode(response.body));
+  } else {
+    // If that call was not successful, throw an error.
+    throw Exception('Failed to load post');
+  }
 }
-class _MyAppState extends State<MyApp> {
-  int counter;
-  @override
-  void initState() {
-    super.initState();
-    counter = counter ?? 0;
-  }
-  void _decrementCounter(_) {
-    setState(() {
-      counter--;
-      print('decrement: $counter');
-    });
-  }
 
-  void _incrementCounter(_) {
-    setState(() {
-      counter++;
-      print('increment: $counter');
-    });
-  }
+void main() => runApp(MyApp(post: fetchPost()));
+
+class MyApp extends StatelessWidget {
+  final Future<Post> post;
+
+  MyApp({Key key, this.post}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'Flutter Demo',
-      theme: new ThemeData(
+    return MaterialApp(
+      title: 'Fetch Data Example',
+      theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: new MyHomePage(
-        title: 'My Home Page',
-        counter: counter,
-        decrementCounter: _decrementCounter,
-        incrementCounter: _incrementCounter,
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Fetch Data Example'),
+        ),
+        body: Center(
+          child: FutureBuilder<Post>(
+            future: post,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Text(snapshot.data.title);
+              } else if (snapshot.hasError) {
+                return Text("${snapshot.error}");
+              }
+
+              // By default, show a loading spinner
+              return CircularProgressIndicator();
+            },
+          ),
+        ),
       ),
     );
   }
