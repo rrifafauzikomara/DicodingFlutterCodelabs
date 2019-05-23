@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(new MyApp());
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
+    return MaterialApp(
       title: 'Bahan Makanan',
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: const Text('Bahan Makanan'),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Bahan Makanan'),
         ),
         body: ListView(
           children: <Widget>[
